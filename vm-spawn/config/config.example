@@ -1,0 +1,80 @@
+# rename this to config.yml
+
+# Note that the actual structure of this file (or its file format,
+# for that matter), is only dependent on how you utilize it in your
+# application. This particular one works with the provided vm-spawn.pl
+# example, but nothing is stopping you from switching from YAML to JSON,
+# using a completely different structure or dropping it altogether and
+# using Bread::Board instead – as long as your Perl code can make use
+# of it. Hell, you can just go crazy and hardcode everything if that's
+# what you like; this example config merely serves as an overview
+# on what can (or: should) be configured
+
+# self-explanatory
+database:
+  driver: 'mysql'
+  database: 'webdemo'
+  host: 'localhost'
+  port: 3306
+  username: 'mysql'
+  password: 'cow.9'
+ 
+# configuration for the toplevel VM::Spawn object
+vmspawn:
+  # maximum active VMs at a time
+  max_vms: 10
+  # maximum active VMs per one IP address
+  max_vms_per_ip_address: 3
+  # the domain under which to register new VMs
+  vms_domain: 'vms.example.com'
+  # minimum interval (in seconds) between two requests
+  # for the same ip-email pair
+  #
+  # prevents accidental request duplication
+  min_req_interval: 60
+
+# configuration for the digitalocean server provider
+digitalocean:
+  # digitalocean API access token
+  token: 'digitalocean api access token here'
+  # SSH keys to put on a created VM. Needed when configuring them later
+  # with VM::Spawn::AppHandler::SSHScript or for debugging
+  #
+  # IDs or fingerprints
+  ssh_keys: [12345, 'fe:ed:de:ad:be:ef:ca:fe']
+
+# configuration for Amazon's Route53 DNS service
+route53:
+  id: 'your r53 id'
+  key: 'your secret r53 key'
+  zone: 'example.com.'
+
+# configuration for VM::Spawn::AppHandler::SSHScript.
+# In this particular usecase we'll use it to setup /etc/motd
+set_motd:
+  ssh_key_path: './vm_ssh_key'
+  setup_script_path: './examples/setup-motd.pl'
+
+# configuration for VM::Spawn::Notifier::Email instances.
+# Here we'll only have one
+email_notifier:
+  from: '"Example company" <contact@example.com>'
+  subject: 'Your demo server is ready'
+  template_dir: './templates/motd'
+  # attachments are optional
+  attachments:
+    # in each of the attachments, everything except content_type,
+    # dest_filename and src_filename is optional and will be added
+    # to the attachment as a header (here: Content-Id)
+    - Content-Id: '<example.png@example.com>'
+      content_type: 'image/png'
+      dest_filename: 'example-logo.png'
+      src_filename: './example-logo.png'
+
+# configuratoin for the email transport itself
+email_transport:
+  ssl: 1
+  host: 'smtp.example.com'
+  port: 465
+  sasl_username: 'joe'
+  sasl_password: 'cow.9'
