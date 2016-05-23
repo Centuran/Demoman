@@ -1,4 +1,4 @@
 This wonderful app makes it easy as a pie to automatically set up virtual
 machines with application demos to demonstrate them to your customers.
 
-See examples/vm-spawn.pl to see what the usage looks like
+See vm-spawn/examples/vm-spawn.pl to see what the usage looks like.
