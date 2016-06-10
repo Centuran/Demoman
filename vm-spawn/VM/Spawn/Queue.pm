@@ -12,11 +12,10 @@ us means to access the currently requested and currently active VMs.
 
 This will set off C<$callback> for each VM in the queue that's
 Time To Live is over. An instance of C<VM::Spawn::Machine> will be
-passed to C<$callback>
+passed to C<$callback>.
 
-Currently, no return value is expected -- C<VM::Spawn::Queue> assumes
-success and will remove the machine from the queue. This is likely to
-change in the future.
+C<$callback> should return a true value if the machine was purged
+successfully and should be removed from the queue.
 
 =head2 C<method for_requested($callback) { ... }>
 

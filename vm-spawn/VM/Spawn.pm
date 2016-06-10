@@ -16,7 +16,7 @@ has 'max_vms'                => (is => 'ro', required => 1);
 has 'max_vms_per_ip_address' => (is => 'ro', required => 1);
 has 'vms_domain'             => (is => 'ro', required => 1);
 has 'min_req_interval'       => (is => 'ro', required => 1);
-
+has 'dry_run'                => (is => 'rw', default => sub { 0 });
 
 sub process_expired {
     my $self = shift;
@@ -25,9 +25,11 @@ sub process_expired {
         my $vm = shift;
 
         $self->logger->log_expired($vm);
+        return if $self->dry_run;
 
         $self->provider->delete($vm);
         $self->dns->delete($vm->hostname, $vm->ip_address);
+        return "I'm making a note here: HUGE SUCCESS";
     });
 }
 
@@ -73,13 +75,15 @@ sub process_requested {
                 $self->logger->log("Too many requests from "
                            . $req->ip_address . " for "
                            . $req->email . ", cancelling");
-                $self->queue->cancel_request($req->id);
+                $self->queue->cancel_request($req->id)
+                    unless $self->dry_run;
                 return;
             }
         }
         $last_request_for{$request_key} = $req->timestamp;
 
         $self->logger->log_requested($req);
+        return if $self->dry_run;
 
         my $symbol = create_symbol($req->id);
         my $hostname = "$symbol." . $self->vms_domain;

@@ -88,7 +88,7 @@ sub for_expired {
             data       => decode_json($row->{data}),
         );
 
-        $cb->($vm); # the actual deletion, hopefully
+        next unless $cb->($vm); # the actual deletion, hopefully
 
         $now = DateTime->now;
 
