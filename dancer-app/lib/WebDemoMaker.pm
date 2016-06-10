@@ -15,17 +15,26 @@ post '/demo' => sub {
 
     if (!defined $params->{email_address}) {
         status '422';
+        info "Dropping requested due to undefined email address";
         return to_json { error => 'E-mail address is not defined'}
     }
     
     if ($params->{email_address} !~ /^[^@]+\@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) {
         status '422';
+        info "Dropping requested due to invalid email address: "
+             . $params->{email_address};
         return to_json { error => 'E-mail address is invalid' };
     }
 
     my $ip_address = request->forwarded_for_address || request->address;
 
     my $requested_dt = DateTime->now;
+
+    info sprintf("Recording request: %s, %s, %s, %s",
+                 $params->{email_address},
+                 $params->{language},
+                 $params->{application},
+                 $ip_address);
 
     database->quick_insert(
         'vms',
