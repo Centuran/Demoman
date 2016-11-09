@@ -58,18 +58,19 @@ set_motd:
 # configuration for VM::Spawn::Notifier::Email instances.
 # Here we'll only have one
 email_notifier:
-  from: '"Example company" <contact@example.com>'
-  subject: 'Your demo server is ready'
-  template_dir: './templates/motd'
-  # attachments are optional
-  attachments:
-    # in each of the attachments, everything except content_type,
-    # dest_filename and src_filename is optional and will be added
-    # to the attachment as a header (here: Content-Id)
-    - Content-Id: '<example.png@example.com>'
-      content_type: 'image/png'
-      dest_filename: 'example-logo.png'
-      src_filename: './example-logo.png'
+  set_motd-en:
+    from: '"Example company" <contact@example.com>'
+    subject: 'Your demo server is ready'
+    template_dir: './templates/motd'
+    # attachments are optional
+    attachments:
+      # in each of the attachments, everything except content_type,
+      # dest_filename and src_filename is optional and will be added
+      # to the attachment as a header (here: Content-Id)
+      - Content-Id: '<example.png@example.com>'
+        content_type: 'image/png'
+        dest_filename: 'example-logo.png'
+        src_filename: './example-logo.png'
 
 # configuratoin for the email transport itself
 email_transport:
