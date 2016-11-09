@@ -42,6 +42,9 @@ digitalocean:
   #
   # IDs or fingerprints
   ssh_keys: [12345, 'fe:ed:de:ad:be:ef:ca:fe']
+  # digitalocean image IDs for each app
+  images:
+    set_motd: 12345
 
 # configuration for Amazon's Route53 DNS service
 route53:

@@ -33,17 +33,16 @@ my $notifier = VM::Spawn::Notifier::Email->new(
 
 my $motdsetter = VM::Spawn::AppHandler::SSHScript->new(
     %{$config->{set_motd}},
-    notifier => $notifier,
 );
 
 my $vmspawn = VM::Spawn->new(
-    queue       => $queue,
-    provider    => $docean,
-    dns         => $r53,
-    apphandlers => {
-        motd => $motdsetter,
-    },
-    logger      => VM::Spawn::Logger::Console->new(),
+    queue          => $queue,
+    provider       => $docean,
+    dns            => $r53,
+    # ignore the type in both, we only have one
+    apphandler_for => sub { $motdsetter },
+    notifier_for   => sub { $notifier   },
+    logger         => VM::Spawn::Logger::Console->new(),
     %{$config->{vmspawn}},
 );
 
