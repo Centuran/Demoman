@@ -5,11 +5,12 @@ use VM::Spawn::Request;
 use VM::Spawn::Machine;
 
 # components
-has 'queue'       => (is => 'ro', required => 1);
-has 'provider'    => (is => 'ro', required => 1);
-has 'dns'         => (is => 'ro', required => 1);
-has 'apphandlers' => (is => 'ro', required => 1);
-has 'logger'      => (is => 'ro', required => 1);
+has 'queue'          => (is => 'ro', required => 1);
+has 'provider'       => (is => 'ro', required => 1);
+has 'dns'            => (is => 'ro', required => 1);
+has 'apphandler_for' => (is => 'ro', required => 1);
+has 'logger'         => (is => 'ro', required => 1);
+has 'notifier_for'   => (is => 'ro', required => 1);
 
 # configuration
 has 'max_vms'                => (is => 'ro', required => 1);
@@ -113,15 +114,21 @@ sub process_requested {
 
     for my $vm (@fresh_vms) {
         my $passwd_suffix = sprintf("%04d", int(rand(10000)));
+        $vm->{passwd_suffix} = $passwd_suffix;
 
-        my $ah = $self->apphandlers->{$vm->{type}};
+        my $type = $vm->{type} . "-" . $vm->{email_lang};
 
-        $ah->setup($vm->{ip_address}, {
-            email_address => $vm->{email_address},
-            email_lang    => $vm->{email_lang},
-            hostname      => $vm->{hostname},
-            passwd_suffix => $passwd_suffix,
-        });
+        my $ah = $self->apphandler_for->($type);
+
+        $ah->setup($vm);
+
+        $self->notifier_for->($type)->notify(
+            $vm->{email_address},
+            {
+                hostname      => $vm->{hostname},
+                passwd_suffix => $vm->{passwd_suffix},
+            }
+        );
     }
 }
 

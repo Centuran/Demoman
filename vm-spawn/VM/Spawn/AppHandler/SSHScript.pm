@@ -21,11 +21,11 @@ sub ssh_retry ($$&) {
 }
 
 sub setup {
-    my ($self, $ip_address, $opts) = @_;
+    my ($self, $vm) = @_;
     my $ssh;
     ssh_retry \$ssh, 20, sub {
         $ssh = Net::OpenSSH->new(
-            'root@' . $ip_address,
+            'root@' . $vm->{ip_address},
             key_path    => $self->ssh_key_path,
             timeout     => 30,
             master_opts => [ -o => "StrictHostKeyChecking=no" ],
@@ -41,21 +41,13 @@ sub setup {
 
     my $scriptname = basename $self->setup_script_path;
 
-    my $email = $opts->{email_address};
     ssh_retry \$ssh, 3, sub {
         my ($out, $err) = $ssh->capture2('perl', "/tmp/$scriptname",
-            $ssh->shell_quote($email), $opts->{passwd_suffix},
-            $opts->{hostname});
+            $ssh->shell_quote($vm->{email_address}), $vm->{passwd_suffix},
+            $vm->{hostname});
     };
 
     $ssh->error and die "remote command failed: " . $ssh->error;
-
-    $self->notifier->notify(
-        $opts->{email_address}, $opts->{email_lang}, {
-            hostname      => $opts->{hostname},
-            passwd_suffix => $opts->{passwd_suffix},
-        }
-    );
 }
 
 'coffee';

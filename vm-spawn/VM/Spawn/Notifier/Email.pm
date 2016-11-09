@@ -12,36 +12,16 @@ use File::Slurp;
 use Template::Tiny;
 
 has 'transport'     => (is => 'ro', required => 1);
-has 'template_dir'  => (is => 'ro', required => 1);
-has 'fallback_lang' => (is => 'ro', required => 1);
-has 'fallback_tmpl' => (is => 'ro');
+has 'template_file' => (is => 'ro', required => 1);
 
 has 'from'        => (is => 'ro', required => 1);
 has 'subject'     => (is => 'ro', required => 1);
 has 'attachments' => (is => 'ro', default => sub { [] });
 
-sub BUILD {
-    my $self = shift;
-    my $fallback_file = sprintf "%s/email-%s.tt",
-                                $self->template_dir,
-                                $self->fallback_lang;
-    unless (-e $fallback_file) {
-        die "Fallback email template $fallback_file doesn't exist; "
-            . "cannot continue";
-    }
-    $self->{fallback_tmpl} = $fallback_file;
-}
-
 sub notify {
-    my ($self, $email_address, $lang, $payload) = @_;
+    my ($self, $email_address, $payload) = @_;
     my $tt = Template::Tiny->new;
-    my $template_file = $self->template_dir . "/email-$lang.tt";
-    unless (-e $template_file) {
-        $template_file = $self->fallback_tmpl;
-        warn "No template file found for language '$lang', falling back "
-             . "to $template_file\n";
-    }
-    my $tmpl = read_file($template_file, binmode => ':utf8');
+    my $tmpl = read_file($self->template_file, binmode => ':utf8');
     my $email_html;
     $tt->process(\$tmpl, $payload, \$email_html);
 
