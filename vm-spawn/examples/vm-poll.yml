@@ -1,0 +1,4 @@
+vmpoll:
+    min_idle_vms: 1
+    vms_domain: 'demoman.example.com'
+    dbfile: 'database.db'
